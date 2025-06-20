@@ -1,0 +1,47 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Photo Gallery</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .gallery { display: flex; flex-wrap: wrap; gap: 10px; }
+    .photo-card { border: 1px solid #ccc; padding: 10px; width: 200px; }
+    img { width: 100%; height: auto; }
+    .tags { font-size: 0.8em; color: #555; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Upload Photo</h1>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="photo" accept="image/*" required>
+    <button type="submit">Upload</button>
+  </form>
+
+  <hr>
+
+  <h2>Gallery</h2>
+  <div class="gallery" id="gallery"></div>
+
+  <script>
+    async function loadGallery() {
+      const res = await fetch('/gallery');
+      const data = await res.json();
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+      data.forEach(photo => {
+        const div = document.createElement('div');
+        div.className = 'photo-card';
+        div.innerHTML = `
+          <img src="${photo.thumbnailUrl}" alt="">
+          <div class="tags">${photo.labels.join(', ')}</div>
+        `;
+        gallery.appendChild(div);
+      });
+    }
+
+    loadGallery();
+  </script>
+</body>
+</html>
