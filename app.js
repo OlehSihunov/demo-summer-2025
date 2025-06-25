@@ -8,7 +8,7 @@ const app = express();
 const upload = multer({ dest: 'uploads/' });
 const s3 = new AWS.S3({ region: 'eu-central-1' });
 
-const BUCKET_NAME = 'photo-gallery-bucket-demo-24-6';
+const BUCKET_NAME = 'my-test-bucket-for-galery-26-06';
 
 app.use(express.static('public'));
 app.use(express.json());
@@ -41,7 +41,6 @@ app.post('/upload', upload.single('photo'), async (req, res) => {
  */
 app.get('/gallery', async (req, res) => {
   try {
-    // 1. Отримати список прев’ю з thumbnails/
     const thumbs = await s3.listObjectsV2({
       Bucket: BUCKET_NAME,
       Prefix: 'thumbnails/',
@@ -51,17 +50,19 @@ app.get('/gallery', async (req, res) => {
       const filename = path.basename(obj.Key, path.extname(obj.Key));
       const thumbUrl = `https://${BUCKET_NAME}.s3.amazonaws.com/${obj.Key}`;
 
-      // 2. Спробувати знайти JSON з метаданими
+      console.log("thumb url:" + filename)
+      // 2. Try to find json JSON with metadata
       let labels = [];
       try {
         const metaObj = await s3.getObject({
           Bucket: BUCKET_NAME,
           Key: `metadata/${filename}.json`
         }).promise();
+        console.log("Metadata: "+ metaObj)
         const meta = JSON.parse(metaObj.Body.toString('utf-8'));
         labels = meta.Labels?.map(l => l.Name) || [];
       } catch (e) {
-        // JSON не знайдено — пропускаємо
+        console.log("not meta  for file "+ filename)
       }
 
       return { thumbnailUrl: thumbUrl, labels };
