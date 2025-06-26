@@ -8,7 +8,7 @@ const app = express();
 const upload = multer({ dest: 'uploads/' });
 const s3 = new AWS.S3({ region: 'eu-central-1' });
 
-const BUCKET_NAME = 'my-test-bucket-for-galery-26-06';
+const BUCKET_NAME = 'gallery-demo-26-6';
 
 app.use(express.static('public'));
 app.use(express.json());
@@ -51,7 +51,7 @@ app.get('/gallery', async (req, res) => {
       const thumbUrl = `https://${BUCKET_NAME}.s3.amazonaws.com/${obj.Key}`;
 
       console.log("thumb url:" + filename)
-      // 2. Try to find json JSON with metadata
+      // 2. Try to find json with metadata
       let labels = [];
       try {
         const metaObj = await s3.getObject({
